@@ -251,7 +251,7 @@ var populateCloudFlare = func(db *sql.DB) error {
 			api, err := cloudflare.New(cloudflareApiKey, cloudflareEmail)
 			if err != nil {
 				color.Red("++ ERROR: %s", err)
-				return err
+				continue
 			}
 
 			// Fetch all zones available to this user.
@@ -337,6 +337,7 @@ var populateGoDaddy = func(db *sql.DB) error {
 			api, err := godaddygo.NewProduction(godaddyKey, godaddySecret)
 			if err != nil {
 				color.Red("++ ERROR: %s", err.Error())
+				continue
 			}
 			//spew.Dump(api)
 			//godaddy := api.V1()
@@ -347,7 +348,6 @@ var populateGoDaddy = func(db *sql.DB) error {
 			//spew.Dump(zones)
 			if err != nil {
 				color.Red("++ ERROR: %s", err)
-				//return err
 				continue
 			}
 
