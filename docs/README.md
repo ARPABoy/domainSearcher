@@ -7,7 +7,6 @@ First step to be taken before program execution is to create creds directory wit
 mkdir configs
 ```
 
-
 ***configs/cloudflare.list:***
 ```
 EMAIL:APIKEY
@@ -26,4 +25,21 @@ NAME:KEY:SECRET:ID
 ***configs/ovh.list:***
 ```
 NAME:KEY:SECRET:CONSUMER:ID
+```
+
+Then:
+```
+go mod tidy
+```
+
+You can get available command line option via:
+```
+go rum domainSearcher.go -h
+```
+
+Bear in mind that DonDominio requires IP authorization in order to query API service, so execute program from allowed systems only or you will get errors.
+
+Also you can check unitary test running:
+```
+go test
 ```
