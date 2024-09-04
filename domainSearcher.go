@@ -441,8 +441,8 @@ var populateDonDominio = func(db *sql.DB) error {
 
 			if resp, err := getDonDominioDomains(client, r); err != nil {
 				//if resp, err := client.Do(r); err != nil {
-				fmt.Println("ERROR: ", err)
-				return err
+				color.Red("++ ERROR populateDonDominio: %s", err)
+				continue
 			} else {
 				// Define json structs
 				type QueryInfo struct {
@@ -509,30 +509,33 @@ func populateDB(db *sql.DB) error {
 	color.Set(color.FgCyan)
 
 	populatingError := false
+
 	fmt.Println("> Populating DB")
+
 	if err := populateOvh(db); err != nil {
-		color.Red("++ ERROR populateOvh: %s", err)
+		//color.Red("++ ERROR populateOvh: %s", err)
 		populatingError = true
 	}
 
 	if err := populateCloudFlare(db); err != nil {
-		color.Red("++ ERROR populateCloudFlare: %s", err)
+		//color.Red("++ ERROR populateCloudFlare: %s", err)
 		populatingError = true
 	}
 
 	if err := populateGoDaddy(db); err != nil {
-		color.Red("++ ERROR populateGoDaddy: %s", err)
+		//color.Red("++ ERROR populateGoDaddy: %s", err)
 		populatingError = true
 	}
 
 	if err := populateDonDominio(db); err != nil {
-		color.Red("++ ERROR populateDonDominio: %s", err)
+		//color.Red("++ ERROR populateDonDominio: %s", err)
 		populatingError = true
 	}
 
 	// If API access fails, color configuration is lost
 	color.Set(color.FgCyan)
 	fmt.Println("> Done")
+
 	if populatingError {
 		return fmt.Errorf("Error populating DB")
 	}
@@ -697,7 +700,7 @@ func regenerateDb(dbFile string) error {
 		return err
 	} else {
 		if err := checkPopulatedDb(sqliteDatabase); err != nil {
-			color.Red("++ ERROR: Error populating DB")
+			color.Red("++ ERROR: Empty DB or not populated correctly")
 			return err
 		} else {
 			fmt.Println("> DB populated successfully")
