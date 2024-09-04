@@ -34,7 +34,7 @@ go mod tidy
 
 You can get available command line options via:
 ```
-go rum domainSearcher.go -h
+go run domainSearcher.go -h
 ```
 
 Bear in mind that DonDominio requires IP authorization in order to query API service, so execute program from allowed systems only or you will get errors.
