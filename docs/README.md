@@ -43,3 +43,5 @@ Also you can check unitary tests running:
 ```
 go test
 ```
+
+Software provided by kr0m(ARPABoy): https://alfaexploit.com
