@@ -27,3 +27,4 @@ go.work.sum
 # Custom app ignores
 configs
 domain_list.db
+go.sum
