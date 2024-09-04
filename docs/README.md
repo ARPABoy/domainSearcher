@@ -39,7 +39,7 @@ go run domainSearcher.go -h
 
 Bear in mind that DonDominio requires IP authorization in order to query API service, so execute program from allowed systems only or you will get errors.
 
-Also you can check unitary test running:
+Also you can check unitary tests running:
 ```
 go test
 ```
