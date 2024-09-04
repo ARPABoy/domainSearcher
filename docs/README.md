@@ -32,7 +32,7 @@ Then:
 go mod tidy
 ```
 
-You can get available command line option via:
+You can get available command line options via:
 ```
 go rum domainSearcher.go -h
 ```
