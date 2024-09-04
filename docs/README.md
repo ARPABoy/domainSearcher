@@ -2,6 +2,7 @@
 
 OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system with sqlite cache support.
 
+First step to be taken before program execution is to create creds directory with the following content:
 ```
 mkdir configs
 ```
