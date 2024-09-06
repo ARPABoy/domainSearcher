@@ -27,6 +27,8 @@ NAME:KEY:SECRET:ID
 NAME:KEY:SECRET:CONSUMER:ID
 ```
 
+---
+
 Then:
 ```
 go mod tidy
