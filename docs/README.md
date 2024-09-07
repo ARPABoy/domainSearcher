@@ -2,6 +2,13 @@
 
 OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system with sqlite cache support.
 
+## Table of Contents
+- [Initial Configuration](#initial-configuration)
+- [CLI Parameters](#cli-parameters)
+
+---
+
+## Initial configuration:
 First step to be taken before program execution is to create creds directory with the following content:
 ```
 mkdir configs
@@ -27,12 +34,14 @@ NAME:KEY:SECRET:ID
 NAME:KEY:SECRET:CONSUMER:ID
 ```
 
----
-
 Then:
 ```
 go mod tidy
 ```
+
+---
+
+## CLI parameters
 
 You can get available command line options via:
 ```
@@ -45,5 +54,7 @@ Also you can check unitary tests running:
 ```
 go test
 ```
+
+---
 
 Software provided by kr0m(ARPABoy): https://alfaexploit.com
