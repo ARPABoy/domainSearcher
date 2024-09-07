@@ -53,6 +53,7 @@ Bear in mind that DonDominio requires IP authorization in order to query API ser
 Also you can check unitary tests running:
 ```
 go test
+go test -coverprofile=coverage.out && go tool cover -func=coverage.out
 ```
 
 ---
