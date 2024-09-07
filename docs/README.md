@@ -1,5 +1,5 @@
-#### hardwareAnalyzer: Linux Raid/disks configuration detection tool with auto contained disk tools.
-MegaRaid/PERC/SAS2IRCU/ADAPTEC/SoftRAID/ZFS/Btrfs/LVM/Disks Linux support.
+#### OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system.
+OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system with sqlite as cache.
 
 ## Table of contents
 - [Initial configuration](#initial-configuration)
