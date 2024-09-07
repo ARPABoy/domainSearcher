@@ -8,8 +8,14 @@ MegaRaid/PERC/SAS2IRCU/ADAPTEC/SoftRAID/ZFS/Btrfs/LVM/Disks Linux support.
 ---
 
 ## Initial configuration:
+
+```
+git clone https://github.com/ARPABoy/domainSearcher.git
+```
+
 First step to be taken before program execution is to create creds directory with the following content:
 ```
+cd domainSearcher
 mkdir configs
 ```
 
