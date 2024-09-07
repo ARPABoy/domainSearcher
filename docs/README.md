@@ -42,7 +42,7 @@ go build
 
 ---
 
-## CLI parameters
+## CLI parameters:
 
 You can get available command line options via:
 ```
