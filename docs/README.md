@@ -2,7 +2,7 @@
 
 OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system with sqlite cache support.
 
-## Table of Contents
+## Table of contents
 - [Initial configuration](#initial-configuration)
 - [CLI parameters](#cli-parameters)
 
