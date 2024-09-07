@@ -19,23 +19,17 @@ cd domainSearcher
 mkdir configs
 ```
 
-***configs/cloudflare.list:***
 ```
+vi configs/cloudflare.list
 EMAIL:APIKEY
-```
 
-***configs/donDominio.list:***
-```
+vi configs/donDominio.list
 NAME:ID:PASS
-```
 
-***configs/godaddy.list:***
-```
+vi configs/godaddy.list
 NAME:KEY:SECRET:ID
-```
 
-***configs/ovh.list:***
-```
+vi configs/ovh.list
 NAME:KEY:SECRET:CONSUMER:ID
 ```
 
