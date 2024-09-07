@@ -1,6 +1,5 @@
-#### OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system.
-
-OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system with sqlite cache support.
+#### hardwareAnalyzer: Linux Raid/disks configuration detection tool with auto contained disk tools.
+MegaRaid/PERC/SAS2IRCU/ADAPTEC/SoftRAID/ZFS/Btrfs/LVM/Disks Linux support.
 
 ## Table of contents
 - [Initial configuration](#initial-configuration)
@@ -37,6 +36,8 @@ NAME:KEY:SECRET:CONSUMER:ID
 Then:
 ```
 go mod tidy
+go build
+./domainSearcher
 ```
 
 ---
