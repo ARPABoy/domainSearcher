@@ -683,7 +683,11 @@ func regenerateDb(dbFile string) error {
 	file.Close()
 
 	// Open DB:
-	sqliteDatabase, _ := sql.Open("sqlite3", dbFile)
+	var sqliteDatabase *sql.DB
+	if sqliteDatabase, err = sql.Open("sqlite3", dbFile); err != nil {
+		color.Red("++ ERROR: regenerateDb Error opening DB file: %s", err)
+		return err
+	}
 	defer sqliteDatabase.Close()
 
 	// Create table:
@@ -785,7 +789,12 @@ func main() {
 			}
 		} else {
 			// Open DB:
-			sqliteDatabase, _ := sql.Open("sqlite3", dbFile)
+			var sqliteDatabase *sql.DB
+			var err error
+			if sqliteDatabase, err = sql.Open("sqlite3", dbFile); err != nil {
+				color.Red("++ ERROR: main Error opening DB file: %s", err)
+				os.Exit(1)
+			}
 			defer sqliteDatabase.Close()
 
 			// Check if DB is populated
@@ -814,7 +823,12 @@ func main() {
 	}
 
 	// Open DB:
-	db, _ := sql.Open("sqlite3", dbFile)
-	defer db.Close()
-	searchCLI(db, false)
+	var sqliteDatabase *sql.DB
+	var err error
+	if sqliteDatabase, err = sql.Open("sqlite3", dbFile); err != nil {
+		color.Red("++ ERROR: main2 Error opening DB file: %s", err)
+		os.Exit(1)
+	}
+	defer sqliteDatabase.Close()
+	searchCLI(sqliteDatabase, false)
 }
