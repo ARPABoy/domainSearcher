@@ -103,7 +103,9 @@ func createTable(db *sql.DB) error {
 	createTableSQL := `CREATE TABLE IF NOT EXISTS domain_list ( "id" VARCHAR(100), "realId" VARCHAR(100), "isp" VARCHAR(100), "domain" VARCHAR(100));`
 	statement, err := db.Prepare(createTableSQL)
 	if err != nil {
-		color.Red("++ ERROR: %s", err.Error())
+		color.Red("++ ERROR: %s", err)
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	}
 	statement.Exec()
@@ -127,18 +129,24 @@ var populateOvh = func(db *sql.DB) error {
 		color.Red("++ ERROR: File does not exist: %s", ovhIdsFile)
 		color.Red("   Create it with the following content syntax:")
 		color.Red("   ovhId:ovhKey:ovhSecret:ovhConsumer:ovhRealId")
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	} else {
 		file, err := os.Open(ovhIdsFile)
 		if err != nil {
 			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 
 		insertSQL := `INSERT INTO domain_list(id, realId, isp, domain) VALUES (?, ?, ?, ?)`
 		statement, err := db.Prepare(insertSQL)
 		if err != nil {
-			color.Red("++ ERROR: %s", err.Error())
+			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 
@@ -177,6 +185,8 @@ var populateOvh = func(db *sql.DB) error {
 			//if err := client.Get("/domain", &OVHDomainData); err != nil {
 			if err := getOvhDomains(client, &OVHDomainData); err != nil {
 				color.Red("++ ERROR: %s", err)
+				// Set default font color:
+				color.Set(color.FgCyan)
 				continue
 			}
 			//fmt.Println("OVHDomainData: ", OVHDomainData)
@@ -186,7 +196,9 @@ var populateOvh = func(db *sql.DB) error {
 				//fmt.Printf("Inserting ID: %s RealID: %s, ISP: %s Domain: %s.\n", ovhId, ovhRealId, "ovh", OVHDomainData[i])
 				_, err = statement.Exec(ovhId, ovhRealId, "ovh", OVHDomainData[i])
 				if err != nil {
-					color.Red("++ ERROR: %s", err.Error())
+					color.Red("++ ERROR: %s", err)
+					// Set default font color:
+					color.Set(color.FgCyan)
 					return err
 				}
 			}
@@ -194,6 +206,8 @@ var populateOvh = func(db *sql.DB) error {
 
 		if err := scanner.Err(); err != nil {
 			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 	}
@@ -216,18 +230,24 @@ var populateCloudFlare = func(db *sql.DB) error {
 		color.Red("++ ERROR: File does not exist: %s", cloudflareIdsFile)
 		color.Red("   Create it with the following content syntax:")
 		color.Red("   email:password")
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	} else {
 		file, err := os.Open(cloudflareIdsFile)
 		if err != nil {
 			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 
 		insertSQL := `INSERT INTO domain_list(id, realId, isp, domain) VALUES (?, ?, ?, ?)`
 		statement, err := db.Prepare(insertSQL)
 		if err != nil {
-			color.Red("++ ERROR: %s", err.Error())
+			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 
@@ -251,6 +271,8 @@ var populateCloudFlare = func(db *sql.DB) error {
 			api, err := cloudflare.New(cloudflareApiKey, cloudflareEmail)
 			if err != nil {
 				color.Red("++ ERROR: %s", err)
+				// Set default font color:
+				color.Set(color.FgCyan)
 				continue
 			}
 
@@ -259,6 +281,8 @@ var populateCloudFlare = func(db *sql.DB) error {
 			zones, err := getCloudFlareDomains(api)
 			if err != nil {
 				color.Red("++ ERROR: %s", err)
+				// Set default font color:
+				color.Set(color.FgCyan)
 				continue
 			}
 
@@ -266,7 +290,9 @@ var populateCloudFlare = func(db *sql.DB) error {
 				//fmt.Println(z.Name)
 				_, err = statement.Exec(cloudflareEmail, cloudflareEmail, "cloudflare", z.Name)
 				if err != nil {
-					color.Red("++ ERROR: %s", err.Error())
+					color.Red("++ ERROR: %s", err)
+					// Set default font color:
+					color.Set(color.FgCyan)
 					return err
 				}
 			}
@@ -274,6 +300,8 @@ var populateCloudFlare = func(db *sql.DB) error {
 
 		if err := scanner.Err(); err != nil {
 			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 	}
@@ -298,18 +326,24 @@ var populateGoDaddy = func(db *sql.DB) error {
 		color.Red("++ ERROR: File does not exist: %s", godaddyIdsFile)
 		color.Red("   Create it with the following content syntax:")
 		color.Red("   ID:key:secret")
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	} else {
 		file, err := os.Open(godaddyIdsFile)
 		if err != nil {
 			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 
 		insertSQL := `INSERT INTO domain_list(id, realId, isp, domain) VALUES (?, ?, ?, ?)`
 		statement, err := db.Prepare(insertSQL)
 		if err != nil {
-			color.Red("++ ERROR: %s", err.Error())
+			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 
@@ -336,7 +370,9 @@ var populateGoDaddy = func(db *sql.DB) error {
 
 			api, err := godaddygo.NewProduction(godaddyKey, godaddySecret)
 			if err != nil {
-				color.Red("++ ERROR: %s", err.Error())
+				color.Red("++ ERROR: %s", err)
+				// Set default font color:
+				color.Set(color.FgCyan)
 				continue
 			}
 			//spew.Dump(api)
@@ -348,6 +384,8 @@ var populateGoDaddy = func(db *sql.DB) error {
 			//spew.Dump(zones)
 			if err != nil {
 				color.Red("++ ERROR: %s", err)
+				// Set default font color:
+				color.Set(color.FgCyan)
 				continue
 			}
 
@@ -355,7 +393,9 @@ var populateGoDaddy = func(db *sql.DB) error {
 				//fmt.Println(z.Domain)
 				_, err = statement.Exec(godaddyId, godaddyRealId, "godaddy", z.Domain)
 				if err != nil {
-					color.Red("++ ERROR: %s", err.Error())
+					color.Red("++ ERROR: %s", err)
+					// Set default font color:
+					color.Set(color.FgCyan)
 					return err
 				}
 			}
@@ -363,6 +403,8 @@ var populateGoDaddy = func(db *sql.DB) error {
 
 		if err := scanner.Err(); err != nil {
 			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 	}
@@ -387,18 +429,24 @@ var populateDonDominio = func(db *sql.DB) error {
 		color.Red("++ ERROR: File does not exist: %s", donDominioIdsFile)
 		color.Red("   Create it with the following content syntax:")
 		color.Red("   id:user:pass")
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	} else {
 		file, err := os.Open(donDominioIdsFile)
 		if err != nil {
 			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 
 		insertSQL := `INSERT INTO domain_list(id, realId, isp, domain) VALUES (?, ?, ?, ?)`
 		statement, err := db.Prepare(insertSQL)
 		if err != nil {
-			color.Red("++ ERROR: %s", err.Error())
+			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 
@@ -442,6 +490,8 @@ var populateDonDominio = func(db *sql.DB) error {
 			if resp, err := getDonDominioDomains(client, r); err != nil {
 				//if resp, err := client.Do(r); err != nil {
 				color.Red("++ ERROR populateDonDominio: %s", err)
+				// Set default font color:
+				color.Set(color.FgCyan)
 				continue
 			} else {
 				// Define json structs
@@ -489,7 +539,9 @@ var populateDonDominio = func(db *sql.DB) error {
 					//fmt.Println("Domain:", domain.Name)
 					_, err = statement.Exec(donDominioId, donDominioUser, "dondominio", domain.Name)
 					if err != nil {
-						color.Red("++ ERROR: %v", err.Error())
+						color.Red("++ ERROR: %v", err)
+						// Set default font color:
+						color.Set(color.FgCyan)
 						return err
 					}
 				}
@@ -498,6 +550,8 @@ var populateDonDominio = func(db *sql.DB) error {
 
 		if err := scanner.Err(); err != nil {
 			color.Red("++ ERROR: %s", err)
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		}
 	}
@@ -567,6 +621,8 @@ func queryDB(domainToSearch string, db *sql.DB) error {
 	row, err := db.Query("SELECT COUNT(*) FROM domain_list WHERE domain=?", domainToSearch)
 	if err != nil {
 		color.Red("++ ERROR: %s", err)
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	}
 	defer row.Close()
@@ -582,6 +638,8 @@ func queryDB(domainToSearch string, db *sql.DB) error {
 			ns, err := getDnsNs(domainToSearch)
 			if err != nil {
 				color.Red("++ ERROR NS: Couldnt query NS servers: %s", err)
+				// Set default font color:
+				color.Set(color.FgCyan)
 			} else {
 				color.Set(color.FgCyan)
 				fmt.Println("------------")
@@ -596,6 +654,8 @@ func queryDB(domainToSearch string, db *sql.DB) error {
 			resp, err := getWhois(domainToSearch)
 			if err != nil {
 				color.Red("++ ERROR WHOIS: %s", err)
+				// Set default font color:
+				color.Set(color.FgCyan)
 			} else {
 				// Print the response
 				color.Set(color.FgCyan)
@@ -616,6 +676,8 @@ func queryDB(domainToSearch string, db *sql.DB) error {
 	row, err = db.Query("SELECT * FROM domain_list WHERE domain=?", domainToSearch)
 	if err != nil {
 		color.Red("++ ERROR: %s", err)
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	}
 	defer row.Close()
@@ -646,6 +708,8 @@ var checkPopulatedDb = func(db *sql.DB) error {
 	row, err := db.Query("SELECT COUNT(*) FROM domain_list")
 	if err != nil {
 		color.Red("++ ERROR: %s", err)
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	}
 	defer row.Close()
@@ -669,13 +733,17 @@ func regenerateDb(dbFile string) error {
 	fileNotFoundError := "remove " + dbFile + ": no such file or directory"
 	if err != nil && err.Error() != fileNotFoundError {
 		color.Red("++ ERROR: %s", err)
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	}
 
 	// Create DB:
 	file, err := os.Create(dbFile)
 	if err != nil {
-		color.Red("++ ERROR: %s", err.Error())
+		color.Red("++ ERROR: %s", err)
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	} else {
 		fmt.Println("> DB file created successfully")
@@ -686,6 +754,8 @@ func regenerateDb(dbFile string) error {
 	var sqliteDatabase *sql.DB
 	if sqliteDatabase, err = sql.Open("sqlite3", dbFile); err != nil {
 		color.Red("++ ERROR: regenerateDb Error opening DB file: %s", err)
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	}
 	defer sqliteDatabase.Close()
@@ -693,6 +763,8 @@ func regenerateDb(dbFile string) error {
 	// Create table:
 	if err := createTable(sqliteDatabase); err != nil {
 		color.Red("++ ERROR creating DB table")
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	} else {
 		fmt.Println("> DB table created successfully")
@@ -701,10 +773,14 @@ func regenerateDb(dbFile string) error {
 	// Populate DB:
 	if err := populateDB(sqliteDatabase); err != nil {
 		color.Red("++ ERROR populating DB")
+		// Set default font color:
+		color.Set(color.FgCyan)
 		return err
 	} else {
 		if err := checkPopulatedDb(sqliteDatabase); err != nil {
 			color.Red("++ ERROR: Empty DB or not populated correctly")
+			// Set default font color:
+			color.Set(color.FgCyan)
 			return err
 		} else {
 			fmt.Println("> DB populated successfully")
@@ -736,6 +812,8 @@ func searchCLI(db *sql.DB, oneSearch bool) {
 					//fmt.Printf("err: %v\n", err)
 					if err := queryDB(domainToSearch, db); err != nil {
 						color.Red("++ ERROR: %s", err)
+						// Set default font color:
+						color.Set(color.FgCyan)
 					}
 				}
 				domainToSearch = ""
