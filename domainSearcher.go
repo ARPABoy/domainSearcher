@@ -2,6 +2,7 @@ package main
 
 // OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system
 // TODO: Inline search domain editing
+// TODO: ProxySocks5 support for domain scraping
 
 // go get github.com/ovh/go-ovh/ovh
 // go get github.com/inancgumus/screen
