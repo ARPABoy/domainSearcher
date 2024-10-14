@@ -49,7 +49,11 @@ You can get available command line options via:
 go run domainSearcher.go -h
 ```
 
-Bear in mind that DonDominio requires IP authorization in order to query API service, so execute program from allowed systems only or you will get errors.
+Bear in mind that DonDominio requires IP authorization in order to query API service, so execute program from allowed systems or use -regenerateDB and -socks5 flag combination.
+```
+ssh USER@ALLOWED_HOST -pPORT -D 7777 -N -f
+go run domainSearcher.go -regenerateDB -socks5 localhost:7777
+```
 
 Also you can check unitary tests running:
 ```
