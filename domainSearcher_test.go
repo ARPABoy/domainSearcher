@@ -385,7 +385,7 @@ func TestPopulateDonDominio(t *testing.T) {
 		t.Fatalf("Failed to create table: %v", err)
 	}
 
-	if err := populateDonDominio(db); err != nil {
+	if err := populateDonDominio(db, "nil"); err != nil {
 		t.Errorf("Expected no error when checking populateDonDominio, but got: %v", err)
 	}
 }
@@ -414,7 +414,7 @@ func TestPopulateDB(t *testing.T) {
 	populateGoDaddy = func(db *sql.DB) error {
 		return nil
 	}
-	populateDonDominio = func(db *sql.DB) error {
+	populateDonDominio = func(db *sql.DB, socks5 string) error {
 		return nil
 	}
 
@@ -424,7 +424,7 @@ func TestPopulateDB(t *testing.T) {
 	}
 	defer db.Close()
 
-	if err := populateDB(db); err != nil {
+	if err := populateDB(db, "nil"); err != nil {
 		t.Errorf("Expected no error when populating db, but got: %v", err)
 	}
 
@@ -437,11 +437,11 @@ func TestPopulateDB(t *testing.T) {
 	populateGoDaddy = func(db *sql.DB) error {
 		return errors.New("populateGoDaddy error")
 	}
-	populateDonDominio = func(db *sql.DB) error {
+	populateDonDominio = func(db *sql.DB, socks5 string) error {
 		return errors.New("populateDonDominio error")
 	}
 
-	if err := populateDB(db); err == nil {
+	if err := populateDB(db, "nil"); err == nil {
 		t.Errorf("Expected error when populating db, but got: %v", err)
 	}
 }
@@ -605,7 +605,7 @@ func TestRegenerateDb(t *testing.T) {
 	populateGoDaddy = func(db *sql.DB) error {
 		return nil
 	}
-	populateDonDominio = func(db *sql.DB) error {
+	populateDonDominio = func(db *sql.DB, socks5 string) error {
 		return nil
 	}
 	checkPopulatedDb = func(db *sql.DB) error {
@@ -613,14 +613,14 @@ func TestRegenerateDb(t *testing.T) {
 	}
 
 	dbFile := "/tmp/testDb.db"
-	if err := regenerateDb(dbFile); err != nil {
+	if err := regenerateDb(dbFile, "nil"); err != nil {
 		t.Errorf("Expected no error when checking TestRegenerateDb, but got: %v", err)
 	}
 
 	checkPopulatedDb = func(db *sql.DB) error {
 		return fmt.Errorf("Error populating DB")
 	}
-	if err := regenerateDb(dbFile); err == nil {
+	if err := regenerateDb(dbFile, "nil"); err == nil {
 		t.Errorf("Expected error when checking TestRegenerateDb, but got: %v", err)
 	}
 
@@ -650,7 +650,7 @@ func TestMain(t *testing.T) {
 	populateGoDaddy = func(db *sql.DB) error {
 		return nil
 	}
-	populateDonDominio = func(db *sql.DB) error {
+	populateDonDominio = func(db *sql.DB, socks5 string) error {
 		return nil
 	}
 	checkPopulatedDb = func(db *sql.DB) error {
@@ -757,7 +757,7 @@ func TestMainDbFileRegenerateDB(t *testing.T) {
 	populateGoDaddy = func(db *sql.DB) error {
 		return nil
 	}
-	populateDonDominio = func(db *sql.DB) error {
+	populateDonDominio = func(db *sql.DB, socks5 string) error {
 		return nil
 	}
 	checkPopulatedDb = func(db *sql.DB) error {

@@ -36,6 +36,7 @@ import (
 	"github.com/ovh/go-ovh/ovh"
 	"github.com/oze4/godaddygo"
 	"github.com/twiny/whois/v2"
+	"golang.org/x/net/proxy"
 	// "github.com/davecgh/go-spew/spew"
 )
 
@@ -420,7 +421,7 @@ var getDonDominioDomains = func(client *http.Client, r *http.Request) (*http.Res
 	return resp, nil
 }
 
-var populateDonDominio = func(db *sql.DB) error {
+var populateDonDominio = func(db *sql.DB, socks5 string) error {
 	// curl -d "apiuser=USERNAME&apipasswd=PASSWORD" -H "Content-Type: application/x-www-form-urlencoded" -X POST https://simple-api.dondominio.net/tool/hello/|jq
 	// DonDominio requires IP-API whitelisting
 	fmt.Println()
@@ -471,6 +472,24 @@ var populateDonDominio = func(db *sql.DB) error {
 			//fmt.Println("donDominioUser: ", donDominioUser)
 			//fmt.Println("donDominioPass: ", donDominioPass)
 
+			client := &http.Client{}
+			if socks5 != "nil" {
+				socks5Proxy := socks5
+				dialer, err := proxy.SOCKS5("tcp", socks5Proxy, nil, proxy.Direct)
+				if err != nil {
+					color.Red("++ ERROR: Unable to connect to SOCKS5 proxy: %v", err)
+					return err
+				}
+
+				transport := &http.Transport{
+					Dial: dialer.Dial,
+				}
+
+				client = &http.Client{
+					Transport: transport,
+				}
+			}
+
 			apiUrl := "https://simple-api.dondominio.net"
 			resource := "/domain/list/"
 			//resource := "/tool/hello/"
@@ -483,7 +502,6 @@ var populateDonDominio = func(db *sql.DB) error {
 			// "https://simple-api.dondominio.net/domain/list/"
 			urlStr := u.String()
 
-			client := &http.Client{}
 			//spew.Dump(client)
 			r, _ := http.NewRequest(http.MethodPost, urlStr, strings.NewReader(data.Encode()))
 			r.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -559,7 +577,7 @@ var populateDonDominio = func(db *sql.DB) error {
 	return nil
 }
 
-func populateDB(db *sql.DB) error {
+func populateDB(db *sql.DB, socks5 string) error {
 	// Set default font color:
 	color.Set(color.FgCyan)
 
@@ -582,7 +600,7 @@ func populateDB(db *sql.DB) error {
 		populatingError = true
 	}
 
-	if err := populateDonDominio(db); err != nil {
+	if err := populateDonDominio(db, socks5); err != nil {
 		//color.Red("++ ERROR populateDonDominio: %s", err)
 		populatingError = true
 	}
@@ -726,7 +744,7 @@ var checkPopulatedDb = func(db *sql.DB) error {
 	return nil
 }
 
-func regenerateDb(dbFile string) error {
+func regenerateDb(dbFile, socks5 string) error {
 	//fmt.Println("Executing: regenerateDb")
 
 	// Remove DB:
@@ -772,7 +790,7 @@ func regenerateDb(dbFile string) error {
 	}
 
 	// Populate DB:
-	if err := populateDB(sqliteDatabase); err != nil {
+	if err := populateDB(sqliteDatabase, socks5); err != nil {
 		color.Red("++ ERROR populating DB")
 		// Set default font color:
 		color.Set(color.FgCyan)
@@ -838,18 +856,26 @@ func main() {
 	// Portable clear screen version
 	screen.MoveTopLeft()
 	screen.Clear()
-	fmt.Println("#############################################################################")
-	fmt.Println("| OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system: Ctrl+c -> Exit  |")
-	fmt.Printf("| v0.7-sqlite: %s - coded by Kr0m: alfaexploit.com              |\n", dbFile)
-	fmt.Println("#############################################################################")
+	fmt.Println("######################################################################################")
+	fmt.Println("| OVH-Cloudflare-GoDaddy-DonDominio(SOCKS-5) NS/Whois search system: Ctrl+c -> Exit  |")
+	fmt.Printf("| v0.8-sqlite: %s - coded by Kr0m: alfaexploit.com                       |\n", dbFile)
+	fmt.Println("######################################################################################")
 	fmt.Println("")
 
 	// -regenerateDB command:
 	regenerateDBPtr := flag.Bool("regenerateDB", false, "Force DB regeneration.")
+	// -socks5 command:
+	socks5Ptr := flag.String("socks5", "", "Use socks5 proxy only for DonDominio scraping.")
 	exitPtr := flag.Bool("exit", false, "Exit without waiting for user input, useful combined with -regenerateDB. Also useful for unit-testing.")
 	flag.Parse()
 	//fmt.Println("regenerateDB:", *regenerateDBPtr)
+	//fmt.Println("socks5:", *socks5Ptr)
 	//fmt.Println("exit:", *exitPtr)
+
+	socks5 := "nil"
+	if *socks5Ptr != "" {
+		socks5 = *socks5Ptr
+	}
 
 	fmt.Printf("> Checking if previous %s file exists\n", dbFile)
 	sqliteBbExists := checkFileExists(dbFile)
@@ -858,7 +884,7 @@ func main() {
 		// Regenerate DB arg:
 		if *regenerateDBPtr {
 			fmt.Println("> Regenerating DB.")
-			if err := regenerateDb(dbFile); err != nil {
+			if err := regenerateDb(dbFile, socks5); err != nil {
 				os.Exit(1)
 			}
 
@@ -879,7 +905,7 @@ func main() {
 			// Check if DB is populated
 			if err := checkPopulatedDb(sqliteDatabase); err != nil {
 				fmt.Println("> DB is not populated")
-				if err := regenerateDb(dbFile); err != nil {
+				if err := regenerateDb(dbFile, socks5); err != nil {
 					os.Exit(1)
 				}
 			}
@@ -891,7 +917,7 @@ func main() {
 		}
 	} else {
 		fmt.Printf("  DB: %s file NOT FOUND, creating it\n", dbFile)
-		if err := regenerateDb(dbFile); err != nil {
+		if err := regenerateDb(dbFile, socks5); err != nil {
 			os.Exit(1)
 		}
 
