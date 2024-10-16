@@ -849,53 +849,52 @@ func TestSearchCLICorrectQuery(t *testing.T) {
 		t.Fatalf("Failed to insert domain: %v", err)
 	}
 
-	// Save original os.Stdout, os.Stderr, and os.Stdin
+	// Save original os.Stdout, os.Stderr
 	osStdoutOri := os.Stdout
 	osStderrOri := os.Stderr
 	colorOutputOri := color.Output
 	colorErrorOri := color.Error
-	osStdinOri := os.Stdin
 
-	// Create pipes for capturing output
+	// Create pipes for capturing output and simulating input
+	// In a pipe what is written to its w extreme can be readed on its r extreme
 	rOut, wOut, _ := os.Pipe()
 	rIn, wIn, _ := os.Pipe()
 
-	// Redirect os.Stdout and os.Stderr to our pipe
+	// Redirect os.Stdout and os.Stderr -> wOut
 	os.Stdout = wOut
 	os.Stderr = wOut
 	color.Output = wOut
 	color.Error = wOut
 
-	// Redirect os.Stdin to our input pipe
-	os.Stdin = rIn
-
-	// Simulate user input by writing to the input pipe
+	// Simulate user input by writing to wIn
 	input := "example.com\n"
 	io.WriteString(wIn, input)
-	wIn.Close()
+	wIn.Close() // Close input after writing
 
-	// Run main function
-	searchCLI(db, true)
+	// Run the search function, readline in searchCLI function doesnt read fro STDIN, it reads from console directly, thats the reason we send the STDIN to read from
+	searchCLI(db, true, io.NopCloser(rIn))
 
-	// Close output pipe to signal that we are done writing
+	// Close the write end of the output pipe to signal that we are done writing
 	wOut.Close()
 
-	// Restore os.Stdout, os.Stderr, and os.Stdin to their original state
+	// Restore os.Stdout and os.Stderr to their original state
 	os.Stdout = osStdoutOri
 	os.Stderr = osStderrOri
 	color.Output = colorOutputOri
 	color.Error = colorErrorOri
-	os.Stdin = osStdinOri
 
-	// Read all output
-	out, _ := io.ReadAll(rOut)
+	// Read the captured output from the pipe
+	out, err := io.ReadAll(rOut)
+	if err != nil {
+		t.Fatalf("Failed to read output: %v", err)
+	}
 
 	// Scan output and check if expected line is present
 	scanner := bufio.NewScanner(bytes.NewReader(out))
 	lineFound := false
 	for scanner.Scan() {
 		line := scanner.Text()
-		//fmt.Println("LINE: ", line)
+		//fmt.Println("LINE: ", line) // Depuración
 		if strings.Contains(line, "DOMAIN: example.com") {
 			lineFound = true
 			break
@@ -931,46 +930,45 @@ func TestSearchCLIIncorrectQuery1(t *testing.T) {
 		t.Fatalf("Failed to insert domain: %v", err)
 	}
 
-	// Save original os.Stdout, os.Stderr, and os.Stdin
+	// Save original os.Stdout, os.Stderr
 	osStdoutOri := os.Stdout
 	osStderrOri := os.Stderr
 	colorOutputOri := color.Output
 	colorErrorOri := color.Error
-	osStdinOri := os.Stdin
 
-	// Create pipes for capturing output
+	// Create pipes for capturing output and simulating input
+	// In a pipe what is written to its w extreme can be readed on its r extreme
 	rOut, wOut, _ := os.Pipe()
 	rIn, wIn, _ := os.Pipe()
 
-	// Redirect os.Stdout and os.Stderr to our pipe
+	// Redirect os.Stdout and os.Stderr -> wOut
 	os.Stdout = wOut
 	os.Stderr = wOut
 	color.Output = wOut
 	color.Error = wOut
-
-	// Redirect os.Stdin to our input pipe
-	os.Stdin = rIn
 
 	// Simulate user input by writing to the input pipe
 	input := "KpYTnQSWGuQ5pm4bQyx9rluKU4q8qLj1QNTd4wcT4OzBgJwQo1BGskbctE1mabrGOUCESgFBeTqEHVbhXEVDJM4rgR56CXDFoWTPIwlM9MTMR09B3fwkUY4GzO2bl35cMpVRL1cYcNJMU98oh0l7KBiBzA6eKHkXdoagQbuuT1KS4OovGAa5JH2TxmbEPSGynT2p3JhDTGVm0ZHRfBly5HharptauKdqVNeZegzlVofJ4D1FxpjOBzqSAeO1VAs.com\n"
 	io.WriteString(wIn, input)
 	wIn.Close()
 
-	// Run main function
-	searchCLI(db, true)
+	// Run the search function, readline in searchCLI function doesnt read fro STDIN, it reads from console directly, thats the reason we send the STDIN to read from
+	searchCLI(db, true, io.NopCloser(rIn))
 
 	// Close output pipe to signal that we are done writing
 	wOut.Close()
 
-	// Restore os.Stdout, os.Stderr, and os.Stdin to their original state
+	// Restore os.Stdout and os.Stderr to their original state
 	os.Stdout = osStdoutOri
 	os.Stderr = osStderrOri
 	color.Output = colorOutputOri
 	color.Error = colorErrorOri
-	os.Stdin = osStdinOri
 
 	// Read all output
 	out, _ := io.ReadAll(rOut)
+	if err != nil {
+		t.Fatalf("Failed to read output: %v", err)
+	}
 
 	// Scan output and check if expected line is present
 	scanner := bufio.NewScanner(bytes.NewReader(out))
@@ -1013,46 +1011,45 @@ func TestSearchCLIIncorrectQuery2(t *testing.T) {
 		t.Fatalf("Failed to insert domain: %v", err)
 	}
 
-	// Save original os.Stdout, os.Stderr, and os.Stdin
+	// Save original os.Stdout, os.Stderr
 	osStdoutOri := os.Stdout
 	osStderrOri := os.Stderr
 	colorOutputOri := color.Output
 	colorErrorOri := color.Error
-	osStdinOri := os.Stdin
 
-	// Create pipes for capturing output
+	// Create pipes for capturing output and simulating input
+	// In a pipe what is written to its w extreme can be readed on its r extreme
 	rOut, wOut, _ := os.Pipe()
 	rIn, wIn, _ := os.Pipe()
 
-	// Redirect os.Stdout and os.Stderr to our pipe
+	// Redirect os.Stdout and os.Stderr -> wOut
 	os.Stdout = wOut
 	os.Stderr = wOut
 	color.Output = wOut
 	color.Error = wOut
-
-	// Redirect os.Stdin to our input pipe
-	os.Stdin = rIn
 
 	// Simulate user input by writing to the input pipe
 	input := "*.asd.com\n"
 	io.WriteString(wIn, input)
 	wIn.Close()
 
-	// Run main function
-	searchCLI(db, true)
+	// Run the search function, readline in searchCLI function doesnt read fro STDIN, it reads from console directly, thats the reason we send the STDIN to read from
+	searchCLI(db, true, io.NopCloser(rIn))
 
 	// Close output pipe to signal that we are done writing
 	wOut.Close()
 
-	// Restore os.Stdout, os.Stderr, and os.Stdin to their original state
+	// Restore os.Stdout and os.Stderr to their original state
 	os.Stdout = osStdoutOri
 	os.Stderr = osStderrOri
 	color.Output = colorOutputOri
 	color.Error = colorErrorOri
-	os.Stdin = osStdinOri
 
 	// Read all output
 	out, _ := io.ReadAll(rOut)
+	if err != nil {
+		t.Fatalf("Failed to read output: %v", err)
+	}
 
 	// Scan output and check if expected line is present
 	scanner := bufio.NewScanner(bytes.NewReader(out))

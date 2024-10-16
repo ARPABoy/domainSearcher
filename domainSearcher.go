@@ -1,7 +1,6 @@
 package main
 
 // OVH-Cloudflare-GoDaddy-DonDominio NS/Whois search system
-// TODO: Inline search domain editing
 
 // go get github.com/ovh/go-ovh/ovh
 // go get github.com/inancgumus/screen
@@ -20,6 +19,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -28,6 +28,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/chzyer/readline"
 	"github.com/cloudflare/cloudflare-go"
 	"github.com/fatih/color"
 	"github.com/inancgumus/screen"
@@ -37,6 +38,11 @@ import (
 	"github.com/twiny/whois/v2"
 	"golang.org/x/net/proxy"
 	// "github.com/davecgh/go-spew/spew"
+)
+
+const (
+	Cyan  = "\033[36m"
+	Reset = "\033[0m"
 )
 
 func checkFileExists(filePath string) bool {
@@ -807,17 +813,32 @@ func regenerateDb(dbFile, socks5 string) error {
 	return nil
 }
 
-func searchCLI(db *sql.DB, oneSearch bool) {
+func searchCLI(db *sql.DB, oneSearch bool, rIn io.ReadCloser) {
 	// Search domain:
 	fmt.Println("")
-	var domainToSearch string
+	// When executed from CLI readline reads straightaway from terminal nos os.Stdin, for that reason we need to pass a STDIN when executed from tests
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt: Cyan + "> Domain to search: " + Reset,
+		Stdin:  rIn,
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer rl.Close()
+
 	for {
 		// Fix: Strange behaviour related to colors when returning from queryDB function, this color reassigment fixes it
 		color.Set(color.FgCyan)
-		fmt.Printf("> Domain to search: ")
-		color.Set(color.FgWhite)
-		fmt.Scanln(&domainToSearch)
+
+		// Read user input
+		line, err := rl.Readline()
+		if err != nil {
+			break
+		}
 		color.Set(color.FgCyan)
+
+		domainToSearch := strings.TrimSpace(line)
+
 		// Check correct domain syntax
 		//fmt.Printf("domainToSearch: %s\n", domainToSearch)
 		//fmt.Printf("len(domainToSearch): %i\n", len(domainToSearch))
@@ -934,5 +955,5 @@ func main() {
 		os.Exit(1)
 	}
 	defer sqliteDatabase.Close()
-	searchCLI(sqliteDatabase, false)
+	searchCLI(sqliteDatabase, false, os.Stdin)
 }
