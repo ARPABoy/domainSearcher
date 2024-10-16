@@ -28,5 +28,4 @@ go.work.sum
 configs
 domain_list.db
 go.sum
-go.mod
 domainSearcher
