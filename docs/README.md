@@ -55,6 +55,21 @@ ssh USER@ALLOWED_HOST -pPORT -D 7777 -N -f
 go run domainSearcher.go -regenerateDB -socks5 localhost:7777
 ```
 
+Regenerate DB and make a query:
+```
+go run domainSearcher.go -regenerateDB
+```
+
+Regenerate DB and exit:
+```
+go run domainSearcher.go -regenerateDB -exit
+```
+
+Fast domain checking:
+```
+go run domainSearcher.go alfaexploit.com
+```
+
 Also you can check unitary tests running:
 ```
 go test
