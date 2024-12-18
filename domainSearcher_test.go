@@ -533,19 +533,19 @@ func TestQueryDB(t *testing.T) {
 	}
 
 	// Search domain
-	err = queryDB("example.com", db)
+	err = queryDB("example.com", db, 0)
 	if err != nil {
 		t.Errorf("Expected no error when querying existing domain, but got: %v", err)
 	}
 
 	// Search non-db domain
-	err = queryDB("alfaexploit.com", db)
+	err = queryDB("alfaexploit.com", db, 0)
 	if err != nil {
 		t.Errorf("Expected no error when querying non-db domain, but got: %v", err)
 	}
 
 	// Search inexistent domain
-	err = queryDB("nonexistent.com", db)
+	err = queryDB("nonexistent.com", db, 0)
 	if err != nil {
 		t.Errorf("Expected no error when querying nonexistent domain, but got: %v", err)
 	}

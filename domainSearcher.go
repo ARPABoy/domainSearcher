@@ -635,7 +635,7 @@ var getWhois = func(domainToSearch string) (whois.Response, error) {
 	}
 }
 
-func queryDB(domainToSearch string, db *sql.DB) error {
+func queryDB(domainToSearch string, db *sql.DB, cliDomain int) error {
 	// Set default font color:
 	color.Set(color.FgCyan)
 
@@ -658,40 +658,42 @@ func queryDB(domainToSearch string, db *sql.DB) error {
 		if n == 0 {
 			color.Yellow("  NOT FOUND")
 
-			// NS lookup:
-			ns, err := getDnsNs(domainToSearch)
-			if err != nil {
-				color.Red("++ ERROR NS: Couldnt query NS servers: %s", err)
-				// Set default font color:
-				color.Set(color.FgCyan)
-			} else {
-				color.Set(color.FgCyan)
-				fmt.Println("------------")
-				color.Yellow("  NS servers:")
-				for _, v := range ns {
-					color.Set(color.FgGreen)
-					fmt.Println("  ", v.Host)
+			if cliDomain == 0 {
+				// NS lookup:
+				ns, err := getDnsNs(domainToSearch)
+				if err != nil {
+					color.Red("++ ERROR NS: Couldnt query NS servers: %s", err)
+					// Set default font color:
+					color.Set(color.FgCyan)
+				} else {
+					color.Set(color.FgCyan)
+					fmt.Println("------------")
+					color.Yellow("  NS servers:")
+					for _, v := range ns {
+						color.Set(color.FgGreen)
+						fmt.Println("  ", v.Host)
+					}
 				}
-			}
 
-			// WHOIS lookup
-			resp, err := getWhois(domainToSearch)
-			if err != nil {
-				color.Red("++ ERROR WHOIS: %s", err)
-				// Set default font color:
-				color.Set(color.FgCyan)
-			} else {
-				// Print the response
-				color.Set(color.FgCyan)
-				fmt.Println("------------")
-				color.Yellow("  WHOIS Info:")
-				color.Set(color.FgGreen)
-				fmt.Printf("%+v\n", resp)
-				color.Set(color.FgCyan)
-				fmt.Println("------------")
-			}
+				// WHOIS lookup
+				resp, err := getWhois(domainToSearch)
+				if err != nil {
+					color.Red("++ ERROR WHOIS: %s", err)
+					// Set default font color:
+					color.Set(color.FgCyan)
+				} else {
+					// Print the response
+					color.Set(color.FgCyan)
+					fmt.Println("------------")
+					color.Yellow("  WHOIS Info:")
+					color.Set(color.FgGreen)
+					fmt.Printf("%+v\n", resp)
+					color.Set(color.FgCyan)
+					fmt.Println("------------")
+				}
 
-			fmt.Println("")
+				fmt.Println("")
+			}
 			return nil
 		}
 	}
@@ -706,22 +708,30 @@ func queryDB(domainToSearch string, db *sql.DB) error {
 	}
 	defer row.Close()
 
-	fmt.Println("------------")
+	if cliDomain == 0 {
+		fmt.Println("------------")
+	}
 	for row.Next() {
 		var id string
 		var realId string
 		var isp string
 		var domain string
 		row.Scan(&id, &realId, &isp, &domain)
-		color.Green("  ID: %s\n", id)
-		color.Green("  REALID: %s\n", realId)
-		color.Green("  ISP: %s\n", isp)
-		color.Green("  DOMAIN: %s\n", domain)
-		color.Set(color.FgCyan)
-		fmt.Println("------------")
+		if cliDomain == 0 {
+			color.Green("  ID: %s\n", id)
+			color.Green("  REALID: %s\n", realId)
+			color.Green("  ISP: %s\n", isp)
+			color.Green("  DOMAIN: %s\n", domain)
+			color.Set(color.FgCyan)
+			fmt.Println("------------")
+		} else {
+			color.Green("%s / %s\n", isp, realId)
+		}
 	}
 
-	fmt.Println("")
+	if cliDomain == 0 {
+		fmt.Println("")
+	}
 	return nil
 }
 
@@ -814,31 +824,9 @@ func regenerateDb(dbFile, socks5 string) error {
 }
 
 func searchCLI(db *sql.DB, oneSearch bool, rIn io.ReadCloser) {
-	// Search domain:
-	fmt.Println("")
-	// When executed from CLI readline reads straightaway from terminal nos os.Stdin, for that reason we need to pass a STDIN when executed from tests
-	rl, err := readline.NewEx(&readline.Config{
-		Prompt: Cyan + "> Domain to search: " + Reset,
-		Stdin:  rIn,
-	})
-	if err != nil {
-		panic(err)
-	}
-	defer rl.Close()
-
-	for {
-		// Fix: Strange behaviour related to colors when returning from queryDB function, this color reassigment fixes it
-		color.Set(color.FgCyan)
-
-		// Read user input
-		line, err := rl.Readline()
-		if err != nil {
-			break
-		}
-		color.Set(color.FgCyan)
-
-		domainToSearch := strings.TrimSpace(line)
-
+	//fmt.Printf("len(os.Args): %v\n", len(os.Args))
+	if len(os.Args) == 2 {
+		domainToSearch := os.Args[1]
 		// Check correct domain syntax
 		//fmt.Printf("domainToSearch: %s\n", domainToSearch)
 		//fmt.Printf("len(domainToSearch): %i\n", len(domainToSearch))
@@ -849,7 +837,7 @@ func searchCLI(db *sql.DB, oneSearch bool, rIn io.ReadCloser) {
 					color.Yellow("  Invalid domain")
 				} else {
 					//fmt.Printf("err: %v\n", err)
-					if err := queryDB(domainToSearch, db); err != nil {
+					if err := queryDB(domainToSearch, db, 1); err != nil {
 						color.Red("++ ERROR: %s", err)
 						// Set default font color:
 						color.Set(color.FgCyan)
@@ -860,8 +848,56 @@ func searchCLI(db *sql.DB, oneSearch bool, rIn io.ReadCloser) {
 				color.Yellow("  Invalid domain")
 			}
 		}
-		if oneSearch {
-			return
+	} else {
+		// Search domain:
+		fmt.Println("")
+		// When executed from CLI readline reads straightaway from terminal nos os.Stdin, for that reason we need to pass a STDIN when executed from tests
+		rl, err := readline.NewEx(&readline.Config{
+			Prompt: Cyan + "> Domain to search: " + Reset,
+			Stdin:  rIn,
+		})
+		if err != nil {
+			panic(err)
+		}
+		defer rl.Close()
+
+		for {
+			// Fix: Strange behaviour related to colors when returning from queryDB function, this color reassigment fixes it
+			color.Set(color.FgCyan)
+
+			// Read user input
+			line, err := rl.Readline()
+			if err != nil {
+				break
+			}
+			color.Set(color.FgCyan)
+
+			domainToSearch := strings.TrimSpace(line)
+
+			// Check correct domain syntax
+			//fmt.Printf("domainToSearch: %s\n", domainToSearch)
+			//fmt.Printf("len(domainToSearch): %i\n", len(domainToSearch))
+			if domainToSearch != "" {
+				if len(domainToSearch) < 100 {
+					if err := checkDNS(domainToSearch); err != nil {
+						//fmt.Printf("err: %v\n", err)
+						color.Yellow("  Invalid domain")
+					} else {
+						//fmt.Printf("err: %v\n", err)
+						if err := queryDB(domainToSearch, db, 0); err != nil {
+							color.Red("++ ERROR: %s", err)
+							// Set default font color:
+							color.Set(color.FgCyan)
+						}
+					}
+					domainToSearch = ""
+				} else {
+					color.Yellow("  Invalid domain")
+				}
+			}
+			if oneSearch {
+				return
+			}
 		}
 	}
 }
@@ -876,11 +912,18 @@ func main() {
 	// Portable clear screen version
 	screen.MoveTopLeft()
 	screen.Clear()
-	fmt.Println("######################################################################################")
-	fmt.Println("| OVH-Cloudflare-GoDaddy-DonDominio(SOCKS-5) NS/Whois search system: Ctrl+c -> Exit  |")
-	fmt.Printf("| v0.8-sqlite: %s - coded by Kr0m: alfaexploit.com                       |\n", dbFile)
-	fmt.Println("######################################################################################")
-	fmt.Println("")
+	//fmt.Printf("len(os.Args): %d\n", len(os.Args))
+	//for i, arg := range os.Args {
+	//	fmt.Printf("Argument %d: %s\n", i, arg)
+	//}
+	// cmd is used by unit tests
+	if len(os.Args) != 2 || os.Args[0] == "cmd" {
+		fmt.Println("######################################################################################")
+		fmt.Println("| OVH-Cloudflare-GoDaddy-DonDominio(SOCKS-5) NS/Whois search system: Ctrl+c -> Exit  |")
+		fmt.Printf("| v0.9-sqlite-cli: %s - coded by Kr0m: alfaexploit.com                   |\n", dbFile)
+		fmt.Println("######################################################################################")
+		fmt.Println("")
+	}
 
 	// -regenerateDB command:
 	regenerateDBPtr := flag.Bool("regenerateDB", false, "Force DB regeneration.")
@@ -897,10 +940,14 @@ func main() {
 		socks5 = *socks5Ptr
 	}
 
-	fmt.Printf("> Checking if previous %s file exists\n", dbFile)
+	if len(os.Args) != 2 {
+		fmt.Printf("> Checking if previous %s file exists\n", dbFile)
+	}
 	sqliteBbExists := checkFileExists(dbFile)
 	if sqliteBbExists {
-		fmt.Printf("  DB: %s FOUND\n", dbFile)
+		if len(os.Args) != 2 {
+			fmt.Printf("  DB: %s FOUND\n", dbFile)
+		}
 		// Regenerate DB arg:
 		if *regenerateDBPtr {
 			fmt.Println("> Regenerating DB.")
